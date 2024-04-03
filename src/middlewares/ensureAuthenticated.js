@@ -5,7 +5,7 @@ function ensureAuthenticated(request, response, next) {
   const auth = authHeader;
 
   if (!auth) {
-    return response.status(403).send({
+    return response.status(403).json({
       message: "jwt token não informado",
     });
   }
@@ -18,7 +18,7 @@ function ensureAuthenticated(request, response, next) {
 
     return next();
   } catch (error) {
-    return response.status(403).send({
+    return response.status(403).json({
       message: "jwt token invalido",
     });
   }

@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const jwt = require("jsonwebtoken");
-const ensureAuthenticated = require("../middlewares/ensureAuthenticated"); 
+const ensureAuthenticated = require("../middlewares/ensureAuthenticated");
 
 const routes = Router();
 
@@ -14,21 +14,25 @@ routes.get("/private", ensureAuthenticated, (req, res) => {
 });
 
 routes.get("/me", function (req, res) {
-  var token = req.headers["x-access-token"];
+  const authHeader = req.headers.authorization;
+  const auth = authHeader;
+  const [, token] = auth.split(" ");
+
   if (!token) {
     return res
       .status(401)
-      .send({ auth: false, message: "Nenhum token informado." });
+      .json({ auth: false, message: "Nenhum token informado." });
   }
 
-  jwt.verify(token, config.secret, function (err, decoded) {
+  console.log(token);
+  jwt.verify(token, process.env.AUTH_SECRET, function (err, decoded) {
     if (err) {
       return res
         .status(500)
-        .send({ auth: false, message: "Falha ao autenticar o token." });
+        .json({ auth: false, message: "Falha ao autenticar o token." });
     }
 
-    res.status(200).send(decoded);
+    res.status(200).json(decoded);
   });
 });
 

@@ -21,7 +21,7 @@ class UsersController {
 
       response.json(user);
     } catch (err) {
-      return response.status(409).send();
+      return response.status(409).json();
     }
   }
 
@@ -34,13 +34,17 @@ class UsersController {
       });
 
       if (!user) {
-        return response.status(403).send("senha ou email incorreto");
+        return response
+          .status(403)
+          .json({ message: "senha ou email incorreto" });
       }
 
       const passwordMatched = await compare(password, user.password);
 
       if (!passwordMatched) {
-        return response.status(403).send("senha ou email incorreto");
+        return response
+          .status(403)
+          .json({ message: "senha ou email incorreto" });
       }
 
       const token = sign({ user }, process.env.AUTH_SECRET, {
@@ -49,7 +53,7 @@ class UsersController {
 
       response.json({ token });
     } catch (err) {
-      return response.status(409).send();
+      return response.status(409).json();
     }
   }
 }
