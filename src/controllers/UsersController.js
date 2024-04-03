@@ -1,29 +1,27 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
+const { hash } = require("bcryptjs");
 const prisma = new PrismaClient();
 
+class UsersController {
+  async create(request, response) {
+    try {
+      const { name, email, password } = request.body;
 
-class UsersController{
+      const hashedPassword = await hash(password, 8);
 
+      const user = await prisma.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+        },
+      });
 
-   async create(request, response){
-       try{
-           const { name, email  } = request.body
-
-
-           const user = await prisma.user.create({
-               data: {
-                   name,
-                   email,
-               },
-           })
-
-
-           response.json(user)
-       }catch (err) {
-           return response.status(409).send()
-       }
-   }
+      response.json(user);
+    } catch (err) {
+      return response.status(409).send();
+    }
+  }
 }
 
-
-module.exports = UsersController
+module.exports = UsersController;
