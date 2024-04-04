@@ -13,6 +13,10 @@ routes.get("/private", ensureAuthenticated, (req, res) => {
   res.status(200).send("funcionou");
 });
 
+routes.post("/logout", ensureAuthenticated, (req, res) => {
+  res.status(200).send({ token: null });
+});
+
 routes.get("/me", function (req, res) {
   const authHeader = req.headers.authorization;
   const auth = authHeader;
@@ -24,16 +28,15 @@ routes.get("/me", function (req, res) {
       .json({ auth: false, message: "Nenhum token informado." });
   }
 
-  console.log(token);
-  jwt.verify(token, process.env.AUTH_SECRET, function (err, decoded) {
-    if (err) {
-      return res
-        .status(500)
-        .json({ auth: false, message: "Falha ao autenticar o token." });
-    }
+  try {
+    const token = jwt.verify(token, process.env.AUTH_SECRET);
 
-    res.status(200).json(decoded);
-  });
+    return res.status(200).json(token);
+  } catch (error) {
+    return response.status(401).json({
+      message: "Falha ao autenticar o token.",
+    });
+  }
 });
 
 // Exporta
